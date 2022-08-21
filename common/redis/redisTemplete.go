@@ -100,3 +100,37 @@ func DeleteOrder(order string) error {
 	log.Debugf("删除OperationOder成功，order=%v\n", order)
 	return nil
 }
+
+func SAdd(key string, value interface{}) (bool, error) {
+	result, err := rdb.SAdd(ctx, key, value).Result()
+	if err != nil {
+		return false, err
+	}
+	return result > 0, nil
+}
+
+func SIsMember(key string, value interface{}) (bool, error) {
+	result, err := rdb.SIsMember(ctx, key, value).Result()
+	if err != nil {
+		return false, err
+	}
+	return result, nil
+}
+
+// Get redis get接口
+func Get(key string) (interface{}, error) {
+	result, err := rdb.Get(ctx, key).Result()
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+// Set redis set接口
+func Set(key string, value interface{}) error {
+	_, err := rdb.Set(ctx, key, value, -1).Result()
+	if err != nil {
+		return err
+	}
+	return nil
+}

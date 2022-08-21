@@ -53,7 +53,7 @@ func UpdateJob(c *gin.Context) {
 	}
 	logger.Debugln(cameraJob)
 
-	err = service.UpdateJob(cameraJob)
+	//err = service.UpdateJob(cameraJob)
 	if err != nil {
 		logger.Debugln(err)
 		c.JSONP(http.StatusInternalServerError, err)
@@ -63,6 +63,18 @@ func UpdateJob(c *gin.Context) {
 	c.JSONP(http.StatusOK, "执行成功")
 }
 
-func DeleteJob(c *gin.Context) {
+func FinishRecord(c *gin.Context) {
+	meetingId := c.Param("meetingId")
+	if meetingId == "" {
+		// 没有传参
+		// 响应
+		c.JSONP(http.StatusBadRequest, "缺少参数meetingId")
+	}
 
+	err := service.FinishRecord(meetingId)
+	if err != nil {
+		c.JSONP(http.StatusOK, "执行失败")
+	}
+
+	c.JSONP(http.StatusOK, "执行成功")
 }

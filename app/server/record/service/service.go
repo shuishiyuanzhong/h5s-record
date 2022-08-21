@@ -2,30 +2,41 @@ package service
 
 import (
 	"h5s_camera_job/app/job"
-	"h5s_camera_job/app/producer"
+	"h5s_camera_job/app/server/record/service/queue"
+	"h5s_camera_job/common/redis"
+)
+
+const (
+	JOB_KEY = "h5s:job:Job:"
 )
 
 func AddJob(job job.CameraJob) error {
-	// 添加进缓存
-	err := job.AddJob()
+	// 将job添加进缓存
+	err := job.SaveJob()
 	if err != nil {
 		return err
 	}
-	// job进入缓存后，调用producer，解析出order，同时加入缓存和publish
-	err = producer.PubMessage(job)
+	// 开始录像
+	err = job.StartRecord()
+	if err != nil {
+		return err
+	}
+	// 将job入队，启动结束录像功能(异步执行)
+	go queue.DelayJob(job)
+
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func UpdateJob(cameraJob job.CameraJob) error {
-	err := cameraJob.UpdateJob()
+func FinishRecord(meetingId string) error {
+	result, err := redis.Get(JOB_KEY + meetingId)
 	if err != nil {
 		return err
 	}
-	// 修改之后重新发放指令
-	err = producer.PubMessage(cameraJob)
+	cameraJob := result.(job.CameraJob)
+	err = cameraJob.FinishRecord()
 	if err != nil {
 		return err
 	}

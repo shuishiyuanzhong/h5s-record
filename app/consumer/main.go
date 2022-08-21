@@ -4,11 +4,12 @@ import (
 	"h5s_camera_job/app/job"
 	customLog "h5s_camera_job/common/log"
 	"h5s_camera_job/common/redis"
-	"runtime"
 	"time"
 )
 
 var log = customLog.Logger()
+
+const ENDING_RECORD_KEY = "h5s:recordSet:Set"
 
 // ReceiveOrder 消费者主线程，持续监听channel，
 // 接收到数据则创建一个新的协程来执行Order
@@ -42,7 +43,7 @@ func delayJob(payload string) {
 		return
 	}
 	// 线程休眠
-	currentTime := time.Now().UnixMilli()
+	currentTime := time.Now().Unix() * 1000
 	if currentTime > order.ExecuteTime {
 		// 当前时间大于命令将要执行的时间，终止协程运行
 		log.Errorln("执行时间错误，executeTime=%v,currentTime=%v\n", order.ExecuteTime, currentTime)
@@ -51,14 +52,18 @@ func delayJob(payload string) {
 
 	time.Sleep(time.Duration(order.ExecuteTime-currentTime) * time.Millisecond)
 
-	// 唤醒后，从zset中查询order
-	err = order.DeleteOrder()
-	if err != nil {
-		log.Printf("获取order失败，order不存在，协程运行终止")
-		// 终止协程
-		runtime.Goexit()
+	// 逻辑修改，查询缓存中如果会议已经有当前会议id的结束记录，如果有结束执行，如果没有记录，写入记录并执行取消任务
+	isMember, err := redis.SIsMember(ENDING_RECORD_KEY, order.Id)
+	if isMember || err != nil {
+		// 已经有记录，说明主持人提前取消会议
+		return
 	}
-	// 执行命令
+	// 没有记录，写入新记录
+	_, err = redis.SAdd(ENDING_RECORD_KEY, order.Id)
+	if err != nil {
+		return
+	}
+	// 执行任务取消录像
 	err = order.ExecuteOrder()
 	if err != nil {
 		return
