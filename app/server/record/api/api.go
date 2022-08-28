@@ -29,6 +29,7 @@ func AddJob(c *gin.Context) {
 	// 调用service中的方法
 	err = service.AddJob(cameraJob)
 	if err != nil {
+		logger.Error(err)
 		c.JSONP(http.StatusInternalServerError, err)
 		return
 	}

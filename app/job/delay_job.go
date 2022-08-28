@@ -296,6 +296,10 @@ func structToStr(i interface{}) string {
 	return string(str)
 }
 
+func (c *CameraJob) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(c)
+}
+
 type Job interface {
 	// AddJob 往redis中新增定时任务
 	AddJob() error

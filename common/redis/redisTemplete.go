@@ -128,7 +128,7 @@ func Get(key string) (interface{}, error) {
 
 // Set redis set接口
 func Set(key string, value interface{}) error {
-	_, err := rdb.Set(ctx, key, value, -1).Result()
+	_, err := rdb.Set(ctx, key, value, 0).Result()
 	if err != nil {
 		return err
 	}
