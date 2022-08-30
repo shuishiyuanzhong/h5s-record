@@ -6,6 +6,7 @@ import (
 	"h5s_camera_job/app/server/record/service"
 	customLog "h5s_camera_job/common/log"
 	"net/http"
+	"time"
 )
 
 var logger = customLog.Logger()
@@ -23,6 +24,12 @@ func AddJob(c *gin.Context) {
 	if cameraJob.StartTime > cameraJob.EndTime {
 		// 入参有误
 		c.JSONP(http.StatusBadRequest, "时间有误")
+		return
+	}
+
+	currentTime := time.Now().Unix() * 1000
+	if currentTime > cameraJob.StartTime {
+		c.JSONP(http.StatusBadRequest, "开始录像时间晚于当前时间")
 		return
 	}
 
