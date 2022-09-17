@@ -1,6 +1,7 @@
 package service
 
 import (
+	"encoding/json"
 	"github.com/shuishiyuanzhong/h5s_record/app/job"
 	"github.com/shuishiyuanzhong/h5s_record/app/server/record/service/queue"
 	"github.com/shuishiyuanzhong/h5s_record/common/redis"
@@ -35,7 +36,12 @@ func FinishRecord(meetingId string) error {
 	if err != nil {
 		return err
 	}
-	cameraJob := result.(job.CameraJob)
+	cameraJob := new(job.CameraJob)
+	err = json.Unmarshal([]byte(result.(string)), cameraJob)
+	if err != nil {
+		return err
+	}
+
 	err = cameraJob.FinishRecord()
 	if err != nil {
 		return err
