@@ -35,7 +35,7 @@ const (
 func (c *CameraJob) SaveJob() error {
 	//err := redis.SetCameraJob(c.Id, c.StructToStr())
 	// 将job存储到redis中，meetingId作为key
-	err := redis.Set(JOB_KEY+string(rune(c.Id)), c)
+	err := redis.Set(JOB_KEY+strconv.Itoa(c.Id), c)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (cameraJob CameraJob) FinishRecord() error {
 func GetJob(meetingId int) (CameraJob, error) {
 	//err := redis.SetCameraJob(c.Id, c.StructToStr())
 	// 将job存储到redis中，meetingId作为key
-	result, err := redis.Get(JOB_KEY + string(rune(meetingId)))
+	result, err := redis.Get(JOB_KEY + strconv.Itoa(meetingId))
 	if err != nil {
 		return CameraJob{}, err
 	}
