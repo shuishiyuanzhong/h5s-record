@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 var log = customLog.Logger()
@@ -44,7 +45,8 @@ func (c *CameraJob) SaveJob() error {
 
 func (c *CameraJob) StartRecord() error {
 	// 录制时长
-	limitTime := (c.EndTime - c.StartTime) / 1000
+	currentTime := time.Now().Unix() * 1000
+	limitTime := (c.EndTime - currentTime) / 1000
 	// 调用接口
 	response, err := http.Get("http://" + c.IP + "/api/v1/ManualRecordStart?limittime=" +
 		strconv.FormatInt(limitTime, 10) + "&token=" + c.Token)
