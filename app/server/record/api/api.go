@@ -54,7 +54,7 @@ func UpdateJob(c *gin.Context) {
 }
 
 func FinishRecord(c *gin.Context) {
-	meetingId := c.Param("meetingId")
+	meetingId := c.Query("meetingId")
 	if meetingId == "" {
 		// 没有传参
 		RenderJson(c, errors.New("缺少参数meetingId"), nil)
