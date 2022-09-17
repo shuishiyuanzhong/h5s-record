@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/go-redis/redis/v8"
-	customLog "h5s_camera_job/common/log"
+	customLog "github.com/shuishiyuanzhong/h5s_record/common/log"
 	"strconv"
 )
 

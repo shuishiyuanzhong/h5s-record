@@ -3,10 +3,10 @@ package api
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"h5s_camera_job/app/job"
-	"h5s_camera_job/app/server/record/service"
-	"h5s_camera_job/app/utils/payload"
-	customLog "h5s_camera_job/common/log"
+	"github.com/shuishiyuanzhong/h5s_record/app/job"
+	"github.com/shuishiyuanzhong/h5s_record/app/server/record/service"
+	"github.com/shuishiyuanzhong/h5s_record/app/utils/payload"
+	customLog "github.com/shuishiyuanzhong/h5s_record/common/log"
 	"net/http"
 )
 

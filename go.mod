@@ -1,4 +1,4 @@
-module h5s_camera_job
+module github.com/shuishiyuanzhong/h5s_record
 
 go 1.17
 
