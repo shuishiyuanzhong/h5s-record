@@ -128,7 +128,7 @@ func mergeVideo(token string, filename string) error {
 		return err
 	}
 	command := exec.Command("ffmpeg", "-f", "concat", "-i",
-		currentPath+"/"+token+"/"+token+".txt", "-c", "copy", baseDir+"/"+filename)
+		currentPath+"\\"+token+"\\"+token+".txt", "-c", "copy", baseDir+"/"+filename)
 	output, err := command.CombinedOutput()
 	if err != nil {
 		log.Infof("控制台输出:\n%s\n", string(output))
@@ -136,6 +136,11 @@ func mergeVideo(token string, filename string) error {
 		return err
 	}
 	log.Infof("控制台输出:\n%s\n", string(output))
+	// remove file
+	err = os.RemoveAll(token)
+	if err != nil {
+		fmt.Println(err)
+	}
 	return nil
 }
 
@@ -181,15 +186,37 @@ func UploadVideoMessage(meetingId int, filename string) error {
 	defer response.Body.Close()
 
 	// TODO 解析响应结果
-	_, err = io.ReadAll(response.Body)
+	result, err := io.ReadAll(response.Body)
 	if err != nil {
 		return err
+	}
+	fmt.Println("request body" + string(bytes))
+	fmt.Println("中控response：" + string(result))
+	resp := new(centerResponse)
+	err = json.Unmarshal(result, resp)
+	if err != nil {
+		return err
+	}
+	if resp.Code != 200 {
+		return fmt.Errorf("err_msg=%v", resp.Msg)
 	}
 
 	return nil
 }
 
+func StopRecord(token, ip string) {
+	// 调用接口
+	http.Get("http://" + ip + "/api/v1/ManualRecordStop?token=" + token)
+}
+
 type ControlRequest struct {
 	MeetingId int    `json:"meetingId"`
 	VideoUrl  string `json:"videoUrl"`
+}
+
+type centerResponse struct {
+	Code       int         `json:"code"`
+	Data       interface{} `json:"data"`
+	ExtendData interface{} `json:"extendData"`
+	Msg        string      `json:"msg"`
 }
