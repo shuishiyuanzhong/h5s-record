@@ -92,7 +92,10 @@ func (cameraJob CameraJob) FinishRecord() error {
 		return err
 	}
 
-	// 直接调用video中的函数，进行视频文件下载、合并
+	// 调用服务端接口结束录像
+	video.StopRecord(cameraJob.Token, cameraJob.IP)
+
+	// 进行视频文件下载、合并
 	err = video.GenerateVideos(cameraJob.FileName, cameraJob.Token, cameraJob.IP)
 	if err != nil {
 		return err
