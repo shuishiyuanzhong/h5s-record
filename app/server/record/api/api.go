@@ -1,9 +1,11 @@
 package api
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"h5s_camera_job/app/job"
 	"h5s_camera_job/app/server/record/service"
+	"h5s_camera_job/app/utils/payload"
 	customLog "h5s_camera_job/common/log"
 	"net/http"
 )
@@ -16,25 +18,19 @@ func AddJob(c *gin.Context) {
 	err := c.BindJSON(&cameraJob)
 	if err != nil {
 		logger.Error(err)
-		c.JSONP(http.StatusBadRequest, err)
+		RenderJson(c, err, nil)
 		return
 	}
 	// 参数校验
 	if cameraJob.StartTime > cameraJob.EndTime {
 		// 入参有误
-		c.JSONP(http.StatusBadRequest, "时间有误")
+		RenderJson(c, err, nil)
 		return
 	}
 
 	// 调用service中的方法
 	err = service.AddJob(cameraJob)
-	if err != nil {
-		logger.Error(err)
-		c.JSONP(http.StatusInternalServerError, err)
-		return
-	}
-	// 响应
-	c.JSONP(http.StatusOK, "执行成功")
+	RenderJson(c, err, nil)
 }
 
 func UpdateJob(c *gin.Context) {
@@ -54,28 +50,26 @@ func UpdateJob(c *gin.Context) {
 	}
 	logger.Debugln(cameraJob)
 
-	//err = service.UpdateJob(cameraJob)
-	if err != nil {
-		logger.Debugln(err)
-		c.JSONP(http.StatusInternalServerError, err)
-		return
-	}
-	// 响应
-	c.JSONP(http.StatusOK, "执行成功")
+	RenderJson(c, err, nil)
 }
 
 func FinishRecord(c *gin.Context) {
 	meetingId := c.Param("meetingId")
 	if meetingId == "" {
 		// 没有传参
-		// 响应
-		c.JSONP(http.StatusBadRequest, "缺少参数meetingId")
+		RenderJson(c, errors.New("缺少参数meetingId"), nil)
 	}
 
 	err := service.FinishRecord(meetingId)
-	if err != nil {
-		c.JSONP(http.StatusOK, "执行失败")
-	}
+	RenderJson(c, err, nil)
+}
 
-	c.JSONP(http.StatusOK, "执行成功")
+func RenderJson(c *gin.Context, result error, obj interface{}) {
+	response := buildPayload(result, obj)
+	c.JSON(http.StatusOK, response)
+}
+
+func buildPayload(result error, obj interface{}) (payLoad *payload.ResponsePayLoad) {
+	payLoad = payload.NewResponsePayLoad(result, obj)
+	return
 }

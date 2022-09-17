@@ -95,7 +95,11 @@ func (cameraJob CameraJob) FinishRecord() error {
 	if err != nil {
 		return err
 	}
-	// TODO 生成视频文件之后，调用后端的服务接口，通知后端下载文件
+	// 生成视频文件之后，调用后端的服务接口，通知后端下载文件
+	err = video.UploadVideoMessage(cameraJob.Id, cameraJob.FileName)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

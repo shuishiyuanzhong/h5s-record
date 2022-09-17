@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"sync"
 )
 
@@ -160,4 +161,35 @@ func getFilePath(filename string, token string, ip string) (ans []string, err er
 		ans = append(ans, s.StrPath)
 	}
 	return
+}
+
+// UploadVideoMessage 上传视频信息至中控后台
+func UploadVideoMessage(meetingId int, filename string) error {
+	var request = &ControlRequest{
+		MeetingId: meetingId,
+		VideoUrl:  "http://8.129.32.153/video/" + filename,
+	}
+
+	bytes, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+
+	response, err := http.Post("http://47.115.32.14:8082/screenControl/platform/meeting/saveVideoRecord",
+		"application/json", strings.NewReader(string(bytes)))
+	// 关闭响应
+	defer response.Body.Close()
+
+	// TODO 解析响应结果
+	_, err = io.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type ControlRequest struct {
+	MeetingId int    `json:"meetingId"`
+	VideoUrl  string `json:"videoUrl"`
 }
