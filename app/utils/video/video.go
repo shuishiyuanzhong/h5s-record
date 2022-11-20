@@ -3,7 +3,7 @@ package video
 import (
 	"encoding/json"
 	"fmt"
-	customLog "github.com/shuishiyuanzhong/h5s_record/common/log"
+	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 	"io"
 	"net/http"
 	"os"

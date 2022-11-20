@@ -2,9 +2,9 @@ package job
 
 import (
 	"encoding/json"
-	"github.com/shuishiyuanzhong/h5s_record/app/utils/video"
-	customLog "github.com/shuishiyuanzhong/h5s_record/common/log"
-	"github.com/shuishiyuanzhong/h5s_record/common/redis"
+	"github.com/shuishiyuanzhong/h5s-record/app/utils/video"
+	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
+	"github.com/shuishiyuanzhong/h5s-record/common/redis"
 	"io"
 	"net/http"
 	"strconv"

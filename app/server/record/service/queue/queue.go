@@ -1,8 +1,8 @@
 package queue
 
 import (
-	"github.com/shuishiyuanzhong/h5s_record/app/job"
-	customLog "github.com/shuishiyuanzhong/h5s_record/common/log"
+	"github.com/shuishiyuanzhong/h5s-record/app/job"
+	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 	"time"
 )
 

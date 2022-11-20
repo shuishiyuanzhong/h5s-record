@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/shuishiyuanzhong/h5s_record/app/server/record/api"
+	"github.com/shuishiyuanzhong/h5s-record/app/server/record/api"
 )
 
 func RegisterRouter(v1 *gin.Engine) {

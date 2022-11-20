@@ -3,10 +3,10 @@ package api
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/shuishiyuanzhong/h5s_record/app/job"
-	"github.com/shuishiyuanzhong/h5s_record/app/server/record/service"
-	"github.com/shuishiyuanzhong/h5s_record/app/utils/payload"
-	customLog "github.com/shuishiyuanzhong/h5s_record/common/log"
+	"github.com/shuishiyuanzhong/h5s-record/app/job"
+	"github.com/shuishiyuanzhong/h5s-record/app/server/record/service"
+	"github.com/shuishiyuanzhong/h5s-record/app/utils/payload"
+	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 	"net/http"
 )
 
