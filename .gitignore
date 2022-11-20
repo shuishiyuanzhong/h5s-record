@@ -17,3 +17,5 @@ vendor/
 .idea/
 
 *.log
+
+h5s-record

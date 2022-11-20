@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	recordRouter "h5s_camera_job/app/server/record/router"
-	customLog "h5s_camera_job/common/log"
+	recordRouter "github.com/shuishiyuanzhong/h5s-record/app/server/record/router"
+	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 )
 
 var router *gin.Engine

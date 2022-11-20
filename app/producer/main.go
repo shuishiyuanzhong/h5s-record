@@ -1,7 +1,7 @@
 package producer
 
 import (
-	customLog "h5s_camera_job/common/log"
+	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 )
 
 var logger = customLog.Logger()

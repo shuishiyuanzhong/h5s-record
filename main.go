@@ -1,8 +1,8 @@
 package main
 
 import (
-	"h5s_camera_job/app/consumer"
-	"h5s_camera_job/common/router"
+	"github.com/shuishiyuanzhong/h5s-record/app/consumer"
+	"github.com/shuishiyuanzhong/h5s-record/common/router"
 )
 
 func main() {

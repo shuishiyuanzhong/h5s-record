@@ -1,9 +1,9 @@
 package service
 
 import (
-	"h5s_camera_job/app/job"
-	"h5s_camera_job/app/server/record/service/queue"
-	"h5s_camera_job/common/redis"
+	"github.com/shuishiyuanzhong/h5s-record/app/job"
+	"github.com/shuishiyuanzhong/h5s-record/app/server/record/service/queue"
+	"github.com/shuishiyuanzhong/h5s-record/common/redis"
 )
 
 const (
