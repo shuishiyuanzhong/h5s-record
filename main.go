@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/shuishiyuanzhong/h5s_record/app/consumer"
-	"github.com/shuishiyuanzhong/h5s_record/common/router"
+	"github.com/shuishiyuanzhong/h5s-record/app/consumer"
+	"github.com/shuishiyuanzhong/h5s-record/common/router"
 )
 
 func main() {

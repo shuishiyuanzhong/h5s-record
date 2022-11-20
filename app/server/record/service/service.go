@@ -2,9 +2,9 @@ package service
 
 import (
 	"encoding/json"
-	"github.com/shuishiyuanzhong/h5s_record/app/job"
-	"github.com/shuishiyuanzhong/h5s_record/app/server/record/service/queue"
-	"github.com/shuishiyuanzhong/h5s_record/common/redis"
+	"github.com/shuishiyuanzhong/h5s-record/app/job"
+	"github.com/shuishiyuanzhong/h5s-record/app/server/record/service/queue"
+	"github.com/shuishiyuanzhong/h5s-record/common/redis"
 )
 
 const (
