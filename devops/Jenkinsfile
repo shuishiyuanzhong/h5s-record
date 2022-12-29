@@ -1,0 +1,55 @@
+pipeline {
+  options {
+    timeout(time: 20, unit: 'MINUTES')
+  }
+
+  environment {
+
+  }
+
+  stages {
+    stage('编译,打包') {
+      options {
+        retry(1)
+      }
+      steps {
+        echo '编译,打包开始'
+        echo '编译,打包结束'
+      }
+    }
+
+    stage('配置替换') {
+      steps {
+        echo '配置替换开始'
+        echo '配置替换结束'
+      }
+    }
+
+    stage('部署服务') {
+        /**
+        when {
+          not {
+            branch 'master'
+          }
+        }
+        **/
+        steps {
+          echo '部署服务开始'
+          echo '部署服务结束'
+        }
+      }
+  }
+
+  post {
+    always {
+      echo 'Pipeline finished, Pushing notification now ...'
+    }
+    success {
+      sh '/bin/bash devops/notify.sh success'
+    }
+    unsuccessful {
+      sh '/bin/bash devops/notify.sh unsuccessful'
+    }
+  }
+
+}
