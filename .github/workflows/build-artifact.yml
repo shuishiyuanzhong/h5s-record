@@ -31,10 +31,7 @@ jobs:
           go-version: 1.18
 
       - name: Build linux amd64 artifact
-        run: make amd
-
-      - name: Build windows artifact
-        run: make windows
+        run: make build-all-platform
 
       - name: Install Oras-0.13.0
         run: |
@@ -53,8 +50,9 @@ jobs:
         run: |
           cd bin
           echo ${{ secrets.GITHUB_TOKEN }} | oras login ghcr.io -u ${ACTOR} --password-stdin
-          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_LINUX}
-          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_WIN}
+#          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_LINUX}
+#          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_WIN}
+          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ./**
 
 
 
