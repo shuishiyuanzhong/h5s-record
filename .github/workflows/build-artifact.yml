@@ -50,8 +50,6 @@ jobs:
         run: |
           cd bin
           echo ${{ secrets.GITHUB_TOKEN }} | oras login ghcr.io -u ${ACTOR} --password-stdin
-#          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_LINUX}
-#          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_WIN}
           oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ./**
 
 
