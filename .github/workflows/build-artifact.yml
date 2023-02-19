@@ -24,6 +24,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.18
+
       - name: Build linux amd64 artifact
         run: make amd
 
