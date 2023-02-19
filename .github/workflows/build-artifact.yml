@@ -30,7 +30,7 @@ jobs:
         with:
           go-version: 1.18
 
-      - name: Build linux amd64 artifact
+      - name: Build artifacts
         run: make build-all-platform
 
       - name: Install Oras-0.13.0
@@ -41,7 +41,7 @@ jobs:
           mv oras-install/oras /usr/local/bin/
           rm -rf oras_0.13.0_*.tar.gz oras-install/
           oras version
-          
+
       - name: SetUp ARTIFACT VERSION
         run: |
           echo "ARTIFACT_VERSION=$(echo ${{ github.ref_name}} | tr '[:upper:]' '[:lower:]')" > ${GITHUB_ENV}
