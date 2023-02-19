@@ -3,6 +3,7 @@ package video
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/juju/errors"
 	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 	"io"
 	"net/http"
@@ -19,17 +20,17 @@ func GenerateVideos(filename, token, ip string) error {
 	// 获取文件下载路径
 	paths, err := getFilePath(filename, token, ip)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	// 下载文件
 	err = downloadVideo(paths, token, ip)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	// 合并mp4
 	err = mergeVideo(token, filename)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	return nil
 }
@@ -42,13 +43,13 @@ func downloadVideo(filepath []string, token string, ip string) error {
 	// 创建一个临时文件夹
 	err := os.Mkdir(token, 0755)
 	if err != nil && !os.IsExist(err) {
-		return err
+		return errors.Trace(err)
 	}
 	// 生成一个文件
 	recordFileName := token + ".txt"
 	recordFile, err := os.OpenFile(token+"/"+recordFileName, os.O_RDWR|os.O_CREATE, 0755)
 	if err != nil && !os.IsExist(err) {
-		return err
+		return errors.Trace(err)
 	}
 	defer recordFile.Close()
 
@@ -76,7 +77,7 @@ func downloadVideo(filepath []string, token string, ip string) error {
 
 			if err != nil && !os.IsExist(err) {
 				file.Close()
-				errorSet <- err
+				errorSet <- errors.Trace(err)
 			}
 
 			//下载文件
@@ -84,16 +85,16 @@ func downloadVideo(filepath []string, token string, ip string) error {
 			log.Debugf("开始下载录像文件:%v\n", downloadPath)
 			defer response.Body.Close()
 			if err != nil {
-				errorSet <- err
+				errorSet <- errors.Trace(err)
 			}
 
 			write, err := io.Copy(file, response.Body)
 			if err != nil {
-				errorSet <- err
+				errorSet <- errors.Trace(err)
 			}
 			log.Debugf("成功下载视频文件:%v,共写入%v个字节\n", filename, write)
 			if err != nil {
-				errorSet <- err
+				errorSet <- errors.Trace(err)
 			}
 
 		}(&waitGroup, i, path)
@@ -109,7 +110,7 @@ func downloadVideo(filepath []string, token string, ip string) error {
 	close(count)
 	for err = range errorSet {
 		// 出现err，返回
-		return err
+		return errors.Trace(err)
 	}
 	return nil
 }
@@ -119,13 +120,13 @@ func mergeVideo(token string, filename string) error {
 	baseDir := "output/"
 	err := os.Mkdir(baseDir, 0755)
 	if err != nil && !os.IsExist(err) {
-		return err
+		return errors.Trace(err)
 	} else {
 		err = nil
 	}
 	currentPath, err := os.Getwd()
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	command := exec.Command("ffmpeg", "-f", "concat", "-i",
 		currentPath+"\\"+token+"\\"+token+".txt", "-c", "copy", baseDir+"/"+filename)
@@ -133,7 +134,7 @@ func mergeVideo(token string, filename string) error {
 	if err != nil {
 		log.Infof("控制台输出:\n%s\n", string(output))
 		fmt.Printf("控制台输出:\n%s\n", string(output))
-		return err
+		return errors.Trace(err)
 	}
 	log.Infof("控制台输出:\n%s\n", string(output))
 	// remove file
@@ -145,11 +146,11 @@ func mergeVideo(token string, filename string) error {
 }
 
 func getFilePath(filename string, token string, ip string) (ans []string, err error) {
-	response, err := http.Get("http://" + ip + "/api/v1/SearchByFilename?type=record&token=" +
+	response, err := http.Get("http://" + ip + "/controller/v1/SearchByFilename?type=record&token=" +
 		token + "&filename=" + filename)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.Trace(err)
 	}
 	// 关闭响应
 	defer response.Body.Close()
@@ -160,7 +161,7 @@ func getFilePath(filename string, token string, ip string) (ans []string, err er
 
 	err = json.Unmarshal(body, tmp)
 	if err != nil {
-		return nil, err
+		return nil, errors.Trace(err)
 	}
 	for _, s := range tmp.Record {
 		ans = append(ans, s.StrPath)
@@ -177,7 +178,7 @@ func UploadVideoMessage(meetingId int, filename string) error {
 
 	bytes, err := json.Marshal(request)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 
 	response, err := http.Post("http://47.115.32.14:8082/screenControl/platform/meeting/saveVideoRecord",
@@ -188,14 +189,14 @@ func UploadVideoMessage(meetingId int, filename string) error {
 	// TODO 解析响应结果
 	result, err := io.ReadAll(response.Body)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	fmt.Println("request body" + string(bytes))
 	fmt.Println("中控response：" + string(result))
 	resp := new(centerResponse)
 	err = json.Unmarshal(result, resp)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	if resp.Code != 200 {
 		return fmt.Errorf("err_msg=%v", resp.Msg)
@@ -206,7 +207,7 @@ func UploadVideoMessage(meetingId int, filename string) error {
 
 func StopRecord(token, ip string) {
 	// 调用接口
-	http.Get("http://" + ip + "/api/v1/ManualRecordStop?token=" + token)
+	http.Get("http://" + ip + "/controller/v1/ManualRecordStop?token=" + token)
 }
 
 type ControlRequest struct {

@@ -2,6 +2,7 @@ package job
 
 import (
 	"encoding/json"
+	"github.com/juju/errors"
 	"github.com/shuishiyuanzhong/h5s-record/app/utils/video"
 	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 	"github.com/shuishiyuanzhong/h5s-record/common/redis"
@@ -38,7 +39,7 @@ func (c *CameraJob) SaveJob() error {
 	// 将job存储到redis中，meetingId作为key
 	err := redis.Set(JOB_KEY+strconv.Itoa(c.Id), c)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	return nil
 }
@@ -48,10 +49,10 @@ func (c *CameraJob) StartRecord() error {
 	currentTime := time.Now().Unix() * 1000
 	limitTime := (c.EndTime - currentTime) / 1000
 	// 调用接口
-	response, err := http.Get("http://" + c.IP + "/api/v1/ManualRecordStart?limittime=" +
+	response, err := http.Get("http://" + c.IP + "/controller/v1/ManualRecordStart?limittime=" +
 		strconv.FormatInt(limitTime, 10) + "&token=" + c.Token)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	// 关闭响应
 	defer response.Body.Close()
@@ -59,13 +60,13 @@ func (c *CameraJob) StartRecord() error {
 	// 解析响应结果
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 
 	ans := new(video.H5sResponse)
 	err = json.Unmarshal(body, ans)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 
 	// 保存好fileName，以便后续使用
@@ -73,7 +74,7 @@ func (c *CameraJob) StartRecord() error {
 	// 缓存进redis中
 	err = c.SaveJob()
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	log.Debug("order执行结束")
 	return nil
@@ -89,7 +90,7 @@ func (cameraJob CameraJob) FinishRecord() error {
 	// 此前没有结束记录，写入新记录
 	_, err = redis.SAdd(ENDING_RECORD_KEY, cameraJob.Id)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 
 	// 调用服务端接口结束录像
@@ -98,12 +99,12 @@ func (cameraJob CameraJob) FinishRecord() error {
 	// 进行视频文件下载、合并
 	err = video.GenerateVideos(cameraJob.FileName, cameraJob.Token, cameraJob.IP)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	// 生成视频文件之后，调用后端的服务接口，通知后端下载文件
 	err = video.UploadVideoMessage(cameraJob.Id, cameraJob.FileName)
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 
 	return nil
@@ -115,7 +116,7 @@ func GetJob(meetingId int) (CameraJob, error) {
 	// 将job存储到redis中，meetingId作为key
 	result, err := redis.Get(JOB_KEY + strconv.Itoa(meetingId))
 	if err != nil {
-		return CameraJob{}, err
+		return CameraJob{}, errors.Trace(err)
 	}
 
 	return result.(CameraJob), nil
@@ -142,12 +143,12 @@ func (c *CameraJob) UpdateJob() error {
 	var old CameraJob
 	err := old.StrToStruct(redis.GetCameraJob(c.Id))
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	// 先从库中删除旧数据
 	err = redis.DeleteCameraJob(strconv.Itoa(c.Id))
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 
 	// 新旧数据比对，如果新数据某字段为空，则将旧数据覆盖到新数据中
@@ -165,7 +166,7 @@ func (c *CameraJob) UpdateJob() error {
 			Type:        1,
 		}.DeleteOrder()
 		if err != nil {
-			return err
+			return errors.Trace(err)
 		}
 	}
 	if c.EndTime == 0 {
@@ -179,7 +180,7 @@ func (c *CameraJob) UpdateJob() error {
 			Type:        0,
 		}.DeleteOrder()
 		if err != nil {
-			return err
+			return errors.Trace(err)
 		}
 	}
 	if c.FileName == "" {
@@ -191,7 +192,7 @@ func (c *CameraJob) UpdateJob() error {
 	// 数据重新进入缓存
 	err = redis.SetCameraJob(c.Id, c.StructToStr())
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 
 	return nil
@@ -214,10 +215,10 @@ func (o OperationOrder) ExecuteOrder() error {
 		// 录制时长
 		limitTime := (job.EndTime - job.StartTime) / 1000
 		// 调用接口
-		response, err := http.Get("http://" + job.IP + "/api/v1/ManualRecordStart?limittime=" +
+		response, err := http.Get("http://" + job.IP + "/controller/v1/ManualRecordStart?limittime=" +
 			strconv.FormatInt(limitTime, 10) + "&token=" + job.Token)
 		if err != nil {
-			return err
+			return errors.Trace(err)
 		}
 		// 关闭响应
 		defer response.Body.Close()
@@ -225,20 +226,20 @@ func (o OperationOrder) ExecuteOrder() error {
 		// 解析响应结果
 		body, err := io.ReadAll(response.Body)
 		if err != nil {
-			return err
+			return errors.Trace(err)
 		}
 
 		ans := new(video.H5sResponse)
 		err = json.Unmarshal(body, ans)
 		if err != nil {
-			return err
+			return errors.Trace(err)
 		}
 
 		// 缓存好fileName，以便后续使用
 		job.FileName = ans.StrFileName
 		err = job.UpdateJob()
 		if err != nil {
-			return err
+			return errors.Trace(err)
 		}
 		log.Debug("order执行结束")
 	} else {
@@ -246,7 +247,7 @@ func (o OperationOrder) ExecuteOrder() error {
 		// 直接调用video中的函数，进行视频文件下载、合并
 		err := video.GenerateVideos(job.FileName, job.Token, job.IP)
 		if err != nil {
-			return err
+			return errors.Trace(err)
 		}
 		// 生成视频文件之后，调用后端的服务接口，通知后端下载文件
 
@@ -258,7 +259,7 @@ func (o OperationOrder) ExecuteOrder() error {
 func (o OperationOrder) SaveOrder() error {
 	err := redis.SetOrder(o.ExecuteTime, o.StructToStr())
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	return nil
 }
@@ -267,7 +268,7 @@ func (o OperationOrder) DeleteOrder() error {
 	err := redis.DeleteOrder(o.StructToStr())
 	if err != nil {
 		log.Errorf("删除Order失败，err=%v", err)
-		return err
+		return errors.Trace(err)
 	}
 	return nil
 }

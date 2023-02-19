@@ -2,8 +2,8 @@ package redis
 
 import (
 	"context"
-	"errors"
 	"github.com/go-redis/redis/v8"
+	"github.com/juju/errors"
 	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 	"strconv"
 )
@@ -63,7 +63,7 @@ func DeleteCameraJob(id string) error {
 	result, err := rdb.HDel(ctx, jobKey, id).Result()
 	if err != nil {
 		log.Errorf("删除CameraJob失败，id=%v，err=%v\n", id, err)
-		return err
+		return errors.Trace(err)
 	}
 	if result == 0 {
 		return errors.New("删除记录数量为0")
@@ -79,7 +79,7 @@ func SetOrder(executeTime int64, member string) error {
 	}).Result()
 	if err != nil {
 		log.Errorf("存储OperationOder失败，err=%v\n", err)
-		return err
+		return errors.Trace(err)
 	}
 	if result == 0 {
 		return errors.New("新增记录数量为0")
@@ -104,7 +104,7 @@ func DeleteOrder(order string) error {
 func SAdd(key string, value interface{}) (bool, error) {
 	result, err := rdb.SAdd(ctx, key, value).Result()
 	if err != nil {
-		return false, err
+		return false, errors.Trace(err)
 	}
 	return result > 0, nil
 }
@@ -112,7 +112,7 @@ func SAdd(key string, value interface{}) (bool, error) {
 func SIsMember(key string, value interface{}) (bool, error) {
 	result, err := rdb.SIsMember(ctx, key, value).Result()
 	if err != nil {
-		return false, err
+		return false, errors.Trace(err)
 	}
 	return result, nil
 }
@@ -121,7 +121,7 @@ func SIsMember(key string, value interface{}) (bool, error) {
 func Get(key string) (interface{}, error) {
 	result, err := rdb.Get(ctx, key).Result()
 	if err != nil {
-		return nil, err
+		return nil, errors.Trace(err)
 	}
 	return result, nil
 }
@@ -130,7 +130,7 @@ func Get(key string) (interface{}, error) {
 func Set(key string, value interface{}) error {
 	_, err := rdb.Set(ctx, key, value, 0).Result()
 	if err != nil {
-		return err
+		return errors.Trace(err)
 	}
 	return nil
 }

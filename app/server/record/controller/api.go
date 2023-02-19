@@ -1,11 +1,11 @@
-package api
+package controller
 
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	//"github.com/juju/errors"
 	"github.com/shuishiyuanzhong/h5s-record/app/job"
 	"github.com/shuishiyuanzhong/h5s-record/app/server/record/service"
-	"github.com/shuishiyuanzhong/h5s-record/app/utils/payload"
 	customLog "github.com/shuishiyuanzhong/h5s-record/common/log"
 	"net/http"
 )
@@ -62,14 +62,4 @@ func FinishRecord(c *gin.Context) {
 
 	err := service.FinishRecord(meetingId)
 	RenderJson(c, err, nil)
-}
-
-func RenderJson(c *gin.Context, result error, obj interface{}) {
-	response := buildPayload(result, obj)
-	c.JSON(http.StatusOK, response)
-}
-
-func buildPayload(result error, obj interface{}) (payLoad *payload.ResponsePayLoad) {
-	payLoad = payload.NewResponsePayLoad(result, obj)
-	return
 }
