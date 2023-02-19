@@ -12,6 +12,7 @@ env:
   ARTIFACT_NAME_WINDOWS: h5s-record-windows.exe
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   ACTOR: ${{ github.actor }}
+  REAL_COMPONENT_NAME: ${{ github.event.repository.name }}
 
 jobs:
   build-and-push-wordpress-image:
@@ -52,8 +53,8 @@ jobs:
         run: |
           cd bin
           echo ${{ secrets.GITHUB_TOKEN }} | oras login ghcr.io -u ${ACTOR} --password-stdin
-          oras push ghcr.io/${OWNER_IN_LOWER}/${ARTIFACT_NAME_LINUX}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_LINUX}
-          oras push ghcr.io/${OWNER_IN_LOWER}/${ARTIFACT_NAME_WIN}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_WIN}
+          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_LINUX}
+          oras push ghcr.io/${OWNER_IN_LOWER}/${REAL_COMPONENT_NAME}:${ARTIFACT_VERSION} ${ARTIFACT_NAME_WIN}
 
 
 
